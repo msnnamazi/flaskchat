@@ -1,0 +1,43 @@
+<html>
+<head>
+    <title>Session</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.1/jquery.min.js" integrity="sha512-aVKKRRi/Q/YV+4mjoKBsE4x3H+BkegoM/em46NNlCqNTmUYADjBbeNefNxYV7giUp0VxICtqdrbqU7iVaeZNXA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.2/socket.io.min.js" integrity="sha512-xzC4RSo+4m1clLhr0pQr6yFjO9bJ0py6+l65SBibI8/pSEU8U4iVZ7xm95WRq8PXw2MKv8SSR3QkqR2jciG5Ug==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+</head>
+<body>
+    <h3 style='color: #ccc;font-size: 30px;'>No message yet..</h3>
+    <div class="message_holder"></div>
+    <form action="" method="POST">
+        <input type="text" class="username" placeholder="User Name">
+        <input type="text" class="message" placeholder="Message">
+        <input type="submit">
+    </form>
+    <script>
+        var socket = io.connect("http://" + document.domain + ":" + location.port);
+        socket.on("connect", function(){
+            socket.emit("my event", {
+                "data": "User Connected"
+            })
+            var form = $("form").on("submit", function(e){
+                e.preventDefault()
+                let user_name = $("input.username").val()
+                let user_input = $("input.message").val()
+                socket.emit("my event", {
+                    user_name : user_name,
+                    message : user_input
+                })
+                $("input.message").val("").focus()
+            })
+
+        })
+        socket.on("my response", function(msg){
+            console.log(msg)
+            if(typeof msg.user_name !== 'undefined'){
+                $('h3').remove()
+                $('div.message_holder').append('<div><b style="color:#000">' + msg.user_name + '</b> ' + msg.message + '</div>')
+            }
+        })
+    </script>
+</body>
+
+</html>
